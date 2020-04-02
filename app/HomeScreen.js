@@ -1,40 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Text,
-  FlatList,
   View,
   StyleSheet,
   Button,
-  RefreshControl,
-  Alert,
   ActivityIndicator,
+  AsyncStorage
 } from 'react-native';
 
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
+import * as Permissions from 'expo-permissions';
+import * as Sharing from 'expo-sharing';
 
 import api from './services/api';
 
 class HomeScreen extends React.Component {
+
 
   constructor(props) {
     super(props);
 
     this.state = {
       hasPermission: null,
-      scanned: false,
+      hasPermissionFiles: null,
+
       paired: false,
+
       address: '',
+
       isPairing: false,
       isUpdatingStatus: false,
+      isPhotoLoading: false,
     }
 
   }
 
   componentDidMount() {
     (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      this.setState({ hasPermission: status === 'granted' });
+
+      let { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL, Permissions.CAMERA);
+      this.setState({ 
+        hasPermission: status === 'granted', 
+      });
+
+      try {
+        const addr = await AsyncStorage.getItem('apiAddress');
+        if (addr !== null) { 
+          this.setState({ address: addr }); 
+          api.setUrl(addr).then(() => { this.updateStatus() })
+        }
+      } catch (error) {
+        console.error(error)
+      }
+
     })();
   }
 
@@ -42,28 +61,51 @@ class HomeScreen extends React.Component {
     //alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     this.setState({
       isPairing: false,
-      scanned: true,
       address: data,
     });
-    api.setUrl(data)
-    this.updateStatus()
+    api.setUrl(data).then(() => { this.updateStatus() })
   };
 
   async handleCodeBtnPress(){
     this.setState({ isPairing: true })
   }
 
+  async handlePictureBtnPress(){
+    
+    if(!this.camera){
+      alert('Camera not found')
+      return
+    }
+
+    const picture = await this.camera.takePictureAsync({ })
+
+    this.setState({ isPhotoLoading: true });
+
+    const resultImg = await api.postImage(picture)
+
+    const downloadedImg = await api.downloadFile(resultImg)
+    
+    this.setState({ isPhotoLoading: false });
+
+    if (!(await Sharing.isAvailableAsync())) {
+      alert(`Uh oh, sharing isn't available on your platform`);
+      return
+    }
+
+    Sharing.shareAsync(downloadedImg);
+    
+  }
+
   async updateStatus(){
     this.setState({ isUpdatingStatus: true });
     const isConnected = await api.heartbeat();
     this.setState({ isUpdatingStatus: false, paired: isConnected });
-    console.log(this.state)
   }
 
   renderStatus(){
     if(this.state.isUpdatingStatus){
       return (
-        <ActivityIndicator size="small" color="#00ff00" />
+        <ActivityIndicator size="large" color="#00ff00" />
       )
     }
     else if(this.state.paired){
@@ -81,10 +123,10 @@ class HomeScreen extends React.Component {
   render() {
     
     if (this.state.hasPermission === null) {
-      return <Text>Requesting for camera permission</Text>;
+      return <Text>Requesting for permissions</Text>;
     }
     if (this.state.hasPermission === false) {
-      return <Text>No access to camera</Text>;
+      return <Text>No access to files and/or camera</Text>;
     }
 
     if(this.state.isPairing){
@@ -118,16 +160,33 @@ class HomeScreen extends React.Component {
       <View style={styles.container}>
 
         <View style={styles.itemContainer}>
-          <Text style={styles.statusTextMeta}>Current Status:</Text>
-        </View>
-
-        <View style={styles.itemContainer}>
           {this.renderStatus()}
         </View>
 
-        <View style={styles.itemContainer}>
-          <Button onPress={() => this.handleCodeBtnPress()} title="Scan QR Code" />
-        </View>
+        {!this.state.paired && (
+          <View style={styles.itemContainer}>
+            <Button onPress={() => this.handleCodeBtnPress()} title="Scan QR Code" />
+          </View>
+        )}
+
+        {this.state.paired && (
+          <View style={{ flex: 1 }}>
+            <Camera 
+              style={{ flex: 1 }} 
+              type={Camera.Constants.Type.back}
+              ref={ref => { 
+                this.camera = ref;
+              }}
+              >
+              </Camera>
+              {this.state.isPhotoLoading ? (
+                <Button disabled={true} onPress={() => this.handlePictureBtnPress()} title="Processing.." />
+              ) : (
+                <Button onPress={() => this.handlePictureBtnPress()} title="Take Picture" />
+              )}
+              
+          </View>
+        )}
 
         <View style={styles.itemContainer}>
           <Button onPress={() => this.updateStatus()} title="Check Connection" />
