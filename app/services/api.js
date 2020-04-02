@@ -1,8 +1,8 @@
-
+import { AsyncStorage } from 'react-native';
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
 
 class Api {
-
-  baseUrl = ''
   
   constructor() {
     if (Api.instance) {
@@ -11,8 +11,13 @@ class Api {
     Api.instance = this;
   }
   
-  setUrl(url){
+  async setUrl(url){
     this.baseUrl = url;
+    try {
+      await AsyncStorage.setItem('apiAddress', this.baseUrl);
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   handleResponse(response) {
@@ -41,12 +46,56 @@ class Api {
       .catch(this.handleError);
   }
 
+  callPOST(endpoint, data){
+    return fetch(this.baseUrl + endpoint, {
+      method: 'POST',
+      body: data
+    })
+      .then(this.handleResponse)
+      .catch(this.handleError);
+  }
+
   heartbeat(){
     if(!this.baseUrl) return false;
 
     return this.call('/heartbeat')
       .then(response => { return (response === 'ok'); })
       .catch(error => { console.log('Error with Heartbeat. Is the server online?'); });
+  }
+
+  postImage(picture){
+    if(!this.baseUrl) return false;
+
+    const body = new FormData()
+
+    body.append('image_file', {
+      uri: picture.uri,
+      type: 'image/jpeg',
+      name: 'image_file'
+    })
+
+    return this.callPOST('/match', body)
+      .then(response => response)
+      .catch(error => { console.log('Error with Posting. Is the server online?'); });
+  }
+
+  async downloadFile(url){
+    if(!this.baseUrl) return false;
+
+    const uri = this.baseUrl + url;
+
+    var filename = url.split("/").pop();
+
+    let fileUri = FileSystem.documentDirectory + filename;
+
+    const result = await FileSystem.downloadAsync(uri, fileUri)
+
+    return result && result.uri
+  }
+
+  async saveFile(fileUri){
+    const asset = await MediaLibrary.createAssetAsync(fileUri)
+    await MediaLibrary.createAlbumAsync("ScreenshotMatcher", asset, false)
   }
 
 }
