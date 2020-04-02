@@ -1,4 +1,4 @@
-# ScreenshotMatcher Android Client
+# ScreenshotMatcher Client
 ### Install dependencies
 ```sh
 # Install expo-cli globally if not already installed
@@ -12,3 +12,4 @@ npm i
 ```sh
 expo start
 ```
+Untested on iOS, some features may not work correctly
