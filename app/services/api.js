@@ -10,6 +10,19 @@ class Api {
     }
     Api.instance = this;
   }
+
+  async init(){
+    try {
+      const addr = await AsyncStorage.getItem('apiAddress');
+      if (addr !== null) { 
+        await this.setUrl(addr)
+        return addr
+      }
+    } catch (error) {
+      console.error(error)
+    }
+    return false
+  }
   
   async setUrl(url){
     this.baseUrl = url;
