@@ -5,11 +5,13 @@ import {
   StyleSheet,
   Button,
   ActivityIndicator,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from 'react-native';
 
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
+import * as ImageManipulator from 'expo-image-manipulator';
 import * as Permissions from 'expo-permissions';
 import * as Sharing from 'expo-sharing';
 
@@ -77,22 +79,40 @@ class HomeScreen extends React.Component {
       return
     }
 
-    const picture = await this.camera.takePictureAsync({ })
+    const pictureOptions = {
+      quality: 0,
+      // skipProcessing: true
+    }
+    
+    const picture = await this.camera.takePictureAsync(pictureOptions)
+
+    const manipResult = await ImageManipulator.manipulateAsync(
+      picture.uri,
+      [{ resize: { width: 512 } }],
+    );
 
     this.setState({ isPhotoLoading: true });
 
-    const resultImg = await api.postImage(picture)
-
-    const downloadedImg = await api.downloadFile(resultImg)
+    const resultImg = await api.postImage(manipResult)
     
-    this.setState({ isPhotoLoading: false });
+    if(resultImg == "no result"){
+      Alert.alert( 'Result', 'No match found', [ { text: 'OK' } ] );
+      this.setState({ isPhotoLoading: false });
+    }
+    else{
 
-    if (!(await Sharing.isAvailableAsync())) {
-      alert(`Uh oh, sharing isn't available on your platform`);
-      return
+      const downloadedImg = await api.downloadFile(resultImg)
+    
+      this.setState({ isPhotoLoading: false });
+  
+      if (!(await Sharing.isAvailableAsync())) {
+        alert(`Uh oh, sharing isn't available on your platform`);
+        return
+      }
+  
+      Sharing.shareAsync(downloadedImg);
     }
 
-    Sharing.shareAsync(downloadedImg);
     
   }
 
@@ -159,16 +179,6 @@ class HomeScreen extends React.Component {
     return (
       <View style={styles.container}>
 
-        <View style={styles.itemContainer}>
-          {this.renderStatus()}
-        </View>
-
-        {!this.state.paired && (
-          <View style={styles.itemContainer}>
-            <Button onPress={() => this.handleCodeBtnPress()} title="Scan QR Code" />
-          </View>
-        )}
-
         {this.state.paired && (
           <View style={{ flex: 1 }}>
             <Camera 
@@ -189,6 +199,16 @@ class HomeScreen extends React.Component {
         )}
 
         <View style={styles.itemContainer}>
+          {this.renderStatus()}
+        </View>
+
+        {!this.state.paired && (
+          <View style={styles.itemContainer}>
+            <Button onPress={() => this.handleCodeBtnPress()} title="Scan QR Code" />
+          </View>
+        )}
+
+        <View style={styles.itemContainer}>
           <Button onPress={() => this.updateStatus()} title="Check Connection" />
         </View>
 
@@ -201,12 +221,12 @@ class HomeScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
     alignContent: "center",
     justifyContent: "center",
   },
   itemContainer: {
     marginVertical: 15,
+    paddingHorizontal: 15,
   },
   statusTextMeta: {
     textAlign: "center",
