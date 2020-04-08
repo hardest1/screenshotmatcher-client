@@ -94,7 +94,7 @@ class Main extends React.Component {
     // post picture to the server
     const resultImg = await Api.postImage(manipResult)
     
-    if(resultImg == "no result"){
+    if(!resultImg ||resultImg == "no result"){
       this.setState({ isPhotoLoading: false });
       Alert.alert( 'Result', 'No match found', [ { text: 'OK' } ] );
       return
