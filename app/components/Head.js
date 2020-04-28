@@ -9,15 +9,37 @@ export default class Head extends React.Component {
   }
 
   renderStatusText(){
+
+    if(this.props.hasResult){
+      return (
+        <Left>
+          <Button transparent onPress={() => this.props.resetResult()}>
+            <Icon name='ios-arrow-back' />
+          </Button>
+        </Left>
+      )
+    }
   
     if(this.props.isUpdating){
-      return <Spinner color="black" />
+      return (
+        <Body style={{ paddingLeft: 5 }}>
+          <Spinner color="white" />
+        </Body>
+      )
     }
     else if(this.props.paired){
-      return <Title>Connected</Title>
+      return (
+        <Body style={{ paddingLeft: 5 }}>
+          <Title>Connected</Title>
+        </Body>
+      )
     }
     else{
-      return <Title>Not connected!</Title>
+      return (
+        <Body style={{ paddingLeft: 5 }}>
+          <Title>Not connected!</Title>
+        </Body>
+      )
     }
 
   }
@@ -26,9 +48,7 @@ export default class Head extends React.Component {
     return (
       <Header>
   
-        <Body style={{ paddingLeft: 5 }}>
-          { this.renderStatusText() }
-        </Body>
+        { this.renderStatusText() }
   
         <Right>
           <Button transparent onPress={this.props.startPairing}>
