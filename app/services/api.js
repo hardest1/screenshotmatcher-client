@@ -2,6 +2,9 @@ import { AsyncStorage } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 
+import { Linking } from "expo";
+
+
 class Api {
   
   constructor() {
@@ -108,7 +111,8 @@ class Api {
 
   async saveFile(fileUri){
     const asset = await MediaLibrary.createAssetAsync(fileUri)
-    await MediaLibrary.createAlbumAsync("ScreenshotMatcher", asset, false)
+    const album = await MediaLibrary.createAlbumAsync("ScreenshotMatcher", asset, false)
+    return asset.uri
   }
 
 }
