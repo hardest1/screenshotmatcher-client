@@ -26,7 +26,7 @@ export default class Cam extends React.Component {
 
         {this.props.isPhotoLoading ? (
           <Button full large disabled>
-            <Spinner color="black"/>
+            <Text>{this.props.loadingMsg}</Text>
           </Button>
         ) : (
           <Button full large onPress={() => this.props.handlePictureBtnPress()} >
