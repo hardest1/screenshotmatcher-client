@@ -3,19 +3,20 @@ import {
   View,
   StyleSheet,
   Alert,
+  Modal
 } from 'react-native';
 
 import { Container, H1 } from 'native-base';
 
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as Permissions from 'expo-permissions';
-import * as Sharing from 'expo-sharing';
 
 import Api from './services/Api';
 
 import Head from './components/Head';
 import Barcode from './components/Barcode';
 import Cam from './components/Cam';
+import Result from './components/Result';
 
 class Main extends React.Component {
 
@@ -26,6 +27,8 @@ class Main extends React.Component {
       paired: false,
 
       hasPermission: null,
+      hasResult: false,
+      resultUri: '',
 
       isPairing: false,
       isUpdatingStatus: false,
@@ -45,6 +48,10 @@ class Main extends React.Component {
       if( await Api.init() ) { await this.updateStatus() }
 
     })();
+  }
+
+  resetResult(){
+    this.setState({ hasResult: false, resultUri: '' })
   }
 
   // init camera ref from within the cam component
@@ -80,7 +87,7 @@ class Main extends React.Component {
       return
     }
 
-    this.setState({ isPhotoLoading: true });
+    this.setState({ isPhotoLoading: true, loadingMsg: 'Matching...' });
     
     // take picture
     const picture = await this.camera.takePictureAsync({ quality: 0 })
@@ -95,26 +102,19 @@ class Main extends React.Component {
     const resultImg = await Api.postImage(manipResult)
     
     if(!resultImg ||resultImg == "no result"){
-      this.setState({ isPhotoLoading: false });
+      this.setState({ isPhotoLoading: false, loadingMsg: '' });
       Alert.alert( 'Result', 'No match found', [ { text: 'OK' } ] );
       return
     }
     else{
+
+      this.setState({ loadingMsg: 'Downloading...' });
+
       // download result image from server
       const downloadedImg = await Api.downloadFile(resultImg)
-    
-      this.setState({ isPhotoLoading: false });
       
-      // check if sharing is available
-      if (!(await Sharing.isAvailableAsync())) {
-        alert(`Uh oh, sharing isn't available on your platform`);
-        return
-      }
-      
-      // share picture
-      Sharing.shareAsync(downloadedImg);
+      this.setState({ resultUri: downloadedImg, hasResult: true, isPhotoLoading: false, loadingMsg: '' });
     }
-
     
   }
 
@@ -141,23 +141,33 @@ class Main extends React.Component {
 
           <Head 
             paired={this.state.paired} 
+            hasResult={this.state.hasResult}
+            resetResult={this.resetResult.bind(this)}
             isUpdating={this.state.isUpdatingStatus} 
             updateStatus={this.updateStatus.bind(this)} 
             startPairing={this.startPairing.bind(this)} 
             />
-          
-          { 
+
+          {
             this.state.isPairing ? (
               <Barcode
                 handleBarCodeScanned={this.handleBarCodeScanned.bind(this)} 
                 />
             ) : (
-              <Cam
-                initCamera={this.initCamera.bind(this)}
-                isPhotoLoading={this.state.isPhotoLoading}
-                handlePictureBtnPress={this.handlePictureBtnPress.bind(this)}
-                />
-            ) 
+              this.state.hasResult ? (
+                <Result 
+                  hasResult={this.state.hasResult}
+                  resultUri={this.state.resultUri}
+                  />
+              ) : (
+                <Cam
+                  initCamera={this.initCamera.bind(this)}
+                  isPhotoLoading={this.state.isPhotoLoading}
+                  loadingMsg={this.state.loadingMsg}
+                  handlePictureBtnPress={this.handlePictureBtnPress.bind(this)}
+                  />
+              )
+            )
           }
 
         </Container>
