@@ -6,6 +6,8 @@ import { Linking } from "expo";
 
 import * as Sharing from 'expo-sharing';
 
+import Feedback from './Feedback';
+
 import Api from '../services/Api';
 
 export default class Result extends React.Component {
@@ -55,11 +57,13 @@ export default class Result extends React.Component {
     return (
       <Content padded contentContainerStyle={{ flex: 1, justifyContent: 'center' }}>
 
+        <Feedback uid={this.props.uid} hasResult={this.props.hasResult} />
+
         {
           this.props.resultUri ? (
             <Image
               resizeMode={'contain'}
-              style={{ width: 'auto', height: 400, margin: 20 }}
+              style={{ width: 'auto', height: 350, margin: 20 }}
               source={{isStatic: true, uri: this.props.resultUri}}
             />
           ) : (
