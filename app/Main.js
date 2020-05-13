@@ -3,10 +3,11 @@ import {
   View,
   StyleSheet,
   Alert,
-  Modal
 } from 'react-native';
 
-import { Container, H1 } from 'native-base';
+import { Container, H1, Text } from 'native-base';
+
+import Modal from 'react-native-modal';
 
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as Permissions from 'expo-permissions';
@@ -17,6 +18,7 @@ import Head from './components/Head';
 import Barcode from './components/Barcode';
 import Cam from './components/Cam';
 import Result from './components/Result';
+import Feedback from './components/Feedback';
 
 class Main extends React.Component {
 
@@ -25,10 +27,12 @@ class Main extends React.Component {
 
     this.state = {
       paired: false,
+      isModalVisible: false,
 
       hasPermission: null,
       hasResult: false,
       resultUri: '',
+      currentUid: '',
 
       isPairing: false,
       isUpdatingStatus: false,
@@ -99,24 +103,34 @@ class Main extends React.Component {
     );
 
     // post picture to the server
-    const resultImg = await Api.postImage(manipResult)
-    
-    if(!resultImg ||resultImg == "no result"){
+    const matchResult = await Api.postImage(manipResult)
+
+    if(!matchResult){
       this.setState({ isPhotoLoading: false, loadingMsg: '' });
-      Alert.alert( 'Result', 'No match found', [ { text: 'OK' } ] );
+      Alert.alert( 'Result', 'Server or Network error', [ { text: 'OK' } ] );
+      return
+    }
+    else if(!matchResult.hasResult){
+      this.setState({ currentUid: matchResult.uid, isPhotoLoading: false, loadingMsg: '' });
+      this.toggleModal();
       return
     }
     else{
 
-      this.setState({ loadingMsg: 'Downloading...' });
+      this.setState({ currentUid: matchResult.uid, loadingMsg: 'Downloading...' });
 
       // download result image from server
-      const downloadedImg = await Api.downloadFile(resultImg)
+      const downloadedImg = await Api.downloadFile(matchResult.filename)
       
       this.setState({ resultUri: downloadedImg, hasResult: true, isPhotoLoading: false, loadingMsg: '' });
     }
     
   }
+
+ 
+  toggleModal = () => {
+    this.setState({isModalVisible: !this.state.isModalVisible});
+  };
 
   render() {
 
@@ -148,6 +162,13 @@ class Main extends React.Component {
             startPairing={this.startPairing.bind(this)} 
             />
 
+          <Modal isVisible={this.state.isModalVisible} onBackButtonPress={this.toggleModal}>
+            <View style={{flex: 1, justifyContent: "center", padding: 10, textAlign: "center", backgroundColor: "white"}}>
+              <Text style={{textAlign:"center", fontWeight:"bold"}}>No match found!</Text>
+              <Feedback uid={this.state.currentUid} hasResult={this.state.hasResult} />
+            </View>
+          </Modal>
+
           {
             this.state.isPairing ? (
               <Barcode
@@ -158,6 +179,7 @@ class Main extends React.Component {
                 <Result 
                   hasResult={this.state.hasResult}
                   resultUri={this.state.resultUri}
+                  uid={this.state.currentUid}
                   />
               ) : (
                 <Cam
