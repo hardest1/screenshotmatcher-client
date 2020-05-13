@@ -84,10 +84,10 @@ class Api {
 
     const body = new FormData()
 
-    body.append('image_file', {
+    body.append('image_file.jpg', {
       uri: picture.uri,
       type: 'image/jpeg',
-      name: 'image_file'
+      name: 'image_file.jpg'
     })
 
     return this.callPOST('/match', body)
@@ -113,6 +113,19 @@ class Api {
     const asset = await MediaLibrary.createAssetAsync(fileUri)
     const album = await MediaLibrary.createAlbumAsync("ScreenshotMatcher", asset, false)
     return asset.uri
+  }
+
+  async sendFeedback(uid, hasResult, comment = ''){
+    console.log('Sending feedback', uid)
+    const body = new FormData()
+
+    body.append('uid', uid)
+    body.append('hasResult', hasResult)
+    body.append('comment', comment)
+
+    return this.callPOST('/feedback', body)
+      .then(response => response)
+      .catch(error => { console.log('Error with Feedback. Is the server online?'); });
   }
 
 }
