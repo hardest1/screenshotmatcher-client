@@ -5,7 +5,7 @@ import {
   Alert,
 } from 'react-native';
 
-import { Container, H1, Text, Button } from 'native-base';
+import { Container, H1, Text, Button, StyleProvider } from 'native-base';
 
 import Modal from 'react-native-modal';
 
@@ -19,6 +19,9 @@ import Barcode from './components/Barcode';
 import Cam from './components/Cam';
 import Result from './components/Result';
 import Feedback from './components/Feedback';
+
+import getTheme from './native-base-theme/components';
+import theme from './native-base-theme/variables/screenshotMatcherTheme';
 
 class Main extends React.Component {
 
@@ -180,7 +183,7 @@ class Main extends React.Component {
     }
     
     return (
-      <>
+      <StyleProvider style={getTheme(theme)}>
         <Container>
 
           <Head 
@@ -238,7 +241,7 @@ class Main extends React.Component {
           }
 
         </Container>
-      </>
+      </StyleProvider>
     );
 
   }
