@@ -83,7 +83,7 @@ export default class Result extends React.Component {
           )
         }
 
-        <Grid style={{marginHorizontal: 20, marginVertical: 10}}>
+        <Grid style={{marginHorizontal: 20, marginTop: 10, marginBottom: 0}}>
           <Col>
             { 
               this.state.isSaving ? (
