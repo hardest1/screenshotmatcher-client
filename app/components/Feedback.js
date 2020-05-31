@@ -53,10 +53,12 @@ export default class Feedback extends React.Component {
         </Button>
         <Modal isVisible={this.state.isModalVisible} onBackButtonPress={this.toggleModal} style={{height:"auto"}}>
           <View style={{flex: 1, justifyContent: "center", padding: 10, textAlign: "center", backgroundColor: "white"}}>
-            <Text style={{textAlign:"center", fontWeight:"bold"}}>Send Feedback</Text>
-            <Item>
+            <Text style={{textAlign:"center", fontWeight:"bold", fontSize: 22}}>Send Feedback</Text>
+            <Text style={{textAlign:"center", marginBottom: 10}}>Match UID: {this.props.uid}</Text>
+            <Text style={{textAlign:"center", marginBottom: 10}}>{this.props.hasResult ? 'Has result' : 'No result'}</Text>
+            <Item style={{marginVertical: 10}}>
               <Input 
-                style={{textAlign:"center", marginVertical: 20}} 
+                style={{textAlign:"center"}} 
                 placeholder="Comment (optional)" 
                 value={this.state.comment} 
                 onChangeText={(val) => this.handleChange(val)} />
@@ -78,8 +80,9 @@ export default class Feedback extends React.Component {
                 )
               )
             }
-            <Text style={{textAlign:"center"}}>Match UID: {this.props.uid}</Text>
-            <Text style={{textAlign:"center"}}>{this.props.hasResult ? 'Has result' : 'No result'}</Text>
+            <Button style={{marginHorizontal: 20, marginVertical: 10}} block  onPress={this.toggleModal} >
+              <Text>Close</Text>
+            </Button>
           </View>
         </Modal>
       </View>
