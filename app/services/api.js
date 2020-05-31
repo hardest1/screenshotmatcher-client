@@ -75,7 +75,7 @@ class Api {
     return fetchWithTimeout(this.baseUrl + endpoint, {
       method: 'POST',
       body: data
-    })
+    }, 15000) // increased timeout of 15 seconds for POST
       .then(this.handleResponse)
       .catch(this.handleError);
   }
