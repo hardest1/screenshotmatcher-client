@@ -31,6 +31,7 @@ class Main extends React.Component {
 
       hasPermission: null,
       hasResult: false,
+      hasScreenshot: false,
       resultUri: '',
       currentUid: '',
       screenshotFile: '',
@@ -56,7 +57,7 @@ class Main extends React.Component {
   }
 
   resetResult(){
-    this.setState({ hasResult: false, resultUri: '' })
+    this.setState({ hasResult: false, hasScreenshot: false, resultUri: '' })
   }
 
   // init camera ref from within the cam component
@@ -153,7 +154,8 @@ class Main extends React.Component {
     }
     // download screenshot from server
     const downloadedImg = await Api.downloadFile(this.state.currentUid, this.state.screenshotFile)
-    this.setState({ resultUri: downloadedImg, hasResult: true });
+    this.setState({ resultUri: downloadedImg, hasScreenshot: true });
+    this.toggleModal();
   };
 
   toggleModal = () => {
@@ -184,6 +186,7 @@ class Main extends React.Component {
           <Head 
             paired={this.state.paired} 
             hasResult={this.state.hasResult}
+            hasScreenshot={this.state.hasScreenshot}
             resetResult={this.resetResult.bind(this)}
             isUpdating={this.state.isUpdatingStatus} 
             updateStatus={this.updateStatus.bind(this)} 
@@ -216,7 +219,7 @@ class Main extends React.Component {
                 handleBarCodeScanned={this.handleBarCodeScanned.bind(this)} 
                 />
             ) : (
-              this.state.hasResult ? (
+              this.state.hasResult || this.state.hasScreenshot ? (
                 <Result 
                   hasResult={this.state.hasResult}
                   resultUri={this.state.resultUri}
