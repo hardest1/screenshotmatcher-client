@@ -5,7 +5,7 @@ import {
   Alert,
 } from 'react-native';
 
-import { Container, H1, Text } from 'native-base';
+import { Container, H1, Text, Button } from 'native-base';
 
 import Modal from 'react-native-modal';
 
@@ -33,6 +33,7 @@ class Main extends React.Component {
       hasResult: false,
       resultUri: '',
       currentUid: '',
+      screenshotFile: '',
 
       isPairing: false,
       isUpdatingStatus: false,
@@ -91,7 +92,7 @@ class Main extends React.Component {
       return
     }
 
-    this.setState({ isPhotoLoading: true, loadingMsg: 'Matching...' });
+    this.setState({ isPhotoLoading: true, loadingMsg: 'Taking Picture...' });
     
     // take picture
     const picture = await this.camera.takePictureAsync({ quality: 0 })
@@ -101,9 +102,13 @@ class Main extends React.Component {
       picture.uri,
       [{ resize: { width: 512 } }],
     );
+    
+    this.setState({ loadingMsg: 'Matching...' });
 
     // post picture to the server
     const matchResult = await Api.postImage(manipResult)
+
+    console.log('match result', matchResult)
 
     if(!matchResult){
       this.setState({ isPhotoLoading: false, loadingMsg: '' });
@@ -111,7 +116,21 @@ class Main extends React.Component {
       return
     }
     else if(!matchResult.hasResult){
-      this.setState({ currentUid: matchResult.uid, isPhotoLoading: false, loadingMsg: '' });
+      if(matchResult.screenshot){
+        this.setState({
+          currentUid: matchResult.uid,
+          screenshotFile: matchResult.screenshot,
+          isPhotoLoading: false,
+          loadingMsg: ''
+        });
+      }
+      else{
+        this.setState({
+          currentUid: matchResult.uid,
+          isPhotoLoading: false,
+          loadingMsg: ''
+        });
+      }
       this.toggleModal();
       return
     }
@@ -120,14 +139,23 @@ class Main extends React.Component {
       this.setState({ currentUid: matchResult.uid, loadingMsg: 'Downloading...' });
 
       // download result image from server
-      const downloadedImg = await Api.downloadFile(matchResult.filename)
+      const downloadedImg = await Api.downloadFile(matchResult.uid, matchResult.filename)
       
       this.setState({ resultUri: downloadedImg, hasResult: true, isPhotoLoading: false, loadingMsg: '' });
     }
     
   }
 
- 
+  getFullScreenshot = async () => {
+    if(!this.state.screenshotFile){
+      Alert.alert( 'Screenshot', 'Could not get screenshot', [ { text: 'OK' } ] );
+      return;
+    }
+    // download screenshot from server
+    const downloadedImg = await Api.downloadFile(this.state.currentUid, this.state.screenshotFile)
+    this.setState({ resultUri: downloadedImg, hasResult: true });
+  };
+
   toggleModal = () => {
     this.setState({isModalVisible: !this.state.isModalVisible});
   };
@@ -164,8 +192,21 @@ class Main extends React.Component {
 
           <Modal isVisible={this.state.isModalVisible} onBackButtonPress={this.toggleModal}>
             <View style={{flex: 1, justifyContent: "center", padding: 10, textAlign: "center", backgroundColor: "white"}}>
-              <Text style={{textAlign:"center", fontWeight:"bold"}}>No match found!</Text>
+
+              <Text style={{textAlign:"center", fontWeight:"bold", fontSize: 22, marginBottom: 20}}>
+                No match found!
+              </Text>
+
               <Feedback uid={this.state.currentUid} hasResult={this.state.hasResult} />
+
+              <Button style={{marginHorizontal: 20, marginVertical: 10}} block  onPress={this.getFullScreenshot} >
+                <Text>Get full Screenshot</Text>
+              </Button>
+
+              <Button style={{marginHorizontal: 20, marginVertical: 10}} block  onPress={this.toggleModal} >
+                <Text>Close</Text>
+              </Button>
+
             </View>
           </Modal>
 
