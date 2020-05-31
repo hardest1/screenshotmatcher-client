@@ -10,7 +10,7 @@ export default class Head extends React.Component {
 
   renderStatusText(){
 
-    if(this.props.hasResult){
+    if(this.props.hasResult || this.props.hasScreenshot){
       return (
         <Left>
           <Button transparent onPress={() => this.props.resetResult()}>
