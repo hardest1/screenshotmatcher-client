@@ -2,6 +2,8 @@ import { AsyncStorage } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 
+import { modelName, osName, osVersion } from 'expo-device';
+
 import { Linking } from "expo";
 
 
@@ -119,9 +121,12 @@ class Api {
     console.log('Sending feedback', uid)
     const body = new FormData()
 
+    const deviceStr =  `${modelName} with ${osName} ${osVersion} `
+
     body.append('uid', uid)
     body.append('hasResult', hasResult)
     body.append('comment', comment)
+    body.append('device', deviceStr)
 
     return this.callPOST('/feedback', body)
       .then(response => response)
