@@ -117,7 +117,7 @@ class Api {
     return asset.uri
   }
 
-  async sendFeedback(uid, hasResult, comment = ''){
+  async sendFeedback(uid, hasResult, hasScreenshot, comment = ''){
     console.log('Sending feedback', uid)
     const body = new FormData()
 
@@ -125,6 +125,7 @@ class Api {
 
     body.append('uid', uid)
     body.append('hasResult', hasResult)
+    body.append('hasScreenshot', hasScreenshot)
     body.append('comment', comment)
     body.append('device', deviceStr)
 

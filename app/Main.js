@@ -200,7 +200,7 @@ class Main extends React.Component {
                 No match found!
               </Text>
 
-              <Feedback uid={this.state.currentUid} hasResult={this.state.hasResult} />
+              <Feedback uid={this.state.currentUid} hasResult={this.state.hasResult} hasScreenshot={this.state.hasScreenshot} />
 
               <Button style={{marginHorizontal: 20, marginVertical: 10}} block  onPress={this.getFullScreenshot} >
                 <Text>Get full Screenshot</Text>
@@ -222,6 +222,7 @@ class Main extends React.Component {
               this.state.hasResult || this.state.hasScreenshot ? (
                 <Result 
                   hasResult={this.state.hasResult}
+                  hasScreenshot={this.state.hasScreenshot}
                   resultUri={this.state.resultUri}
                   uid={this.state.currentUid}
                   />

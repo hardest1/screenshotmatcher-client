@@ -57,7 +57,7 @@ export default class Result extends React.Component {
     return (
       <Content padded contentContainerStyle={{ flex: 1, justifyContent: 'center' }}>
 
-        <Feedback uid={this.props.uid} hasResult={this.props.hasResult} />
+        <Feedback uid={this.props.uid} hasResult={this.props.hasResult} hasScreenshot={this.props.hasScreenshot}  />
 
         {
           this.props.resultUri ? (

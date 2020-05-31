@@ -32,7 +32,7 @@ export default class Feedback extends React.Component {
   async handleSubmit() {
     this.setState({isSubmitting: true});
 
-    const fbResult = await Api.sendFeedback(this.props.uid, this.props.hasResult, this.state.comment)
+    const fbResult = await Api.sendFeedback(this.props.uid, this.props.hasResult, this.props.hasScreenshot, this.state.comment)
 
     if(fbResult){
       this.setState({isSubmitting: false, feedbackSent: true});
@@ -56,6 +56,13 @@ export default class Feedback extends React.Component {
             <Text style={{textAlign:"center", fontWeight:"bold", fontSize: 22}}>Send Feedback</Text>
             <Text style={{textAlign:"center", marginBottom: 10}}>Match UID: {this.props.uid}</Text>
             <Text style={{textAlign:"center", marginBottom: 10}}>{this.props.hasResult ? 'Has result' : 'No result'}</Text>
+            {
+              this.props.hasScreenshot ? (
+                <Text style={{textAlign:"center", marginBottom: 10}}>Used screenshot as alternative</Text>
+              ) : (
+                <></>
+              )
+            }
             <Item style={{marginVertical: 10}}>
               <Input 
                 style={{textAlign:"center"}} 
