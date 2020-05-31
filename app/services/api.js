@@ -6,6 +6,13 @@ import { modelName, osName, osVersion } from 'expo-device';
 
 import { Linking } from "expo";
 
+// https://stackoverflow.com/a/54208009
+async function fetchWithTimeout(url, options, timeout = 5000) {
+  return Promise.race([
+      fetch(url, options),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
+  ]);
+}
 
 class Api {
   
@@ -59,13 +66,13 @@ class Api {
   }
 
   call(endpoint){
-    return fetch(this.baseUrl + endpoint)
+    return fetchWithTimeout(this.baseUrl + endpoint)
       .then(this.handleResponse)
       .catch(this.handleError);
   }
 
   callPOST(endpoint, data){
-    return fetch(this.baseUrl + endpoint, {
+    return fetchWithTimeout(this.baseUrl + endpoint, {
       method: 'POST',
       body: data
     })
