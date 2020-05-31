@@ -95,14 +95,14 @@ class Api {
       .catch(error => { console.log('Error with Posting. Is the server online?'); });
   }
 
-  async downloadFile(url){
+  async downloadFile(uid, url){
     if(!this.baseUrl) return false;
 
     const uri = this.baseUrl + url;
 
     var filename = url.split("/").pop();
 
-    let fileUri = FileSystem.documentDirectory + filename;
+    let fileUri = FileSystem.cacheDirectory + uid + filename;
 
     const result = await FileSystem.downloadAsync(uri, fileUri)
 
