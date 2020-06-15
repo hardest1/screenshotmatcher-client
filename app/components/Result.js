@@ -63,11 +63,11 @@ export default class Result extends React.Component {
           this.props.resultUri ? (
             <Image
               resizeMode={'contain'}
-              style={{ width: 'auto', height: 350, margin: 20 }}
+              style={{ width: 'auto', height: '45%', margin: 20 }}
               source={{isStatic: true, uri: this.props.resultUri}}
             />
           ) : (
-            <Text>No result available</Text>
+            <Text style={{ width: 'auto', height: '45%', margin: 20, textAlign: 'center' }}>No result available</Text>
           )
         }
 
@@ -88,18 +88,18 @@ export default class Result extends React.Component {
             { 
               this.state.isSaving ? (
                 <Button style={{marginRight: 10}} block disabled >
-                  <Text>Saving...</Text>
+                  <Text style={{ textAlign:'center' }}>Saving...</Text>
                 </Button>
               ) : (
-                <Button style={{marginRight: 10}} block onPress={() => this.download()} >
-                  <Text>Save to Gallery</Text>
+                <Button style={{marginRight: 10 }} block onPress={() => this.download()} >
+                  <Text style={{ textAlign:'center' }}>Save to Gallery</Text>
                 </Button>
               )
             }
           </Col>
           <Col>
             <Button style={{marginLeft: 10}} block onPress={() => this.openGallery()} >
-              <Text>Open Gallery</Text>
+              <Text style={{ textAlign:'center' }}>Open Gallery</Text>
             </Button>
           </Col>
         </Grid>
