@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, ToastAndroid } from 'react-native';
-import { Header, Title, Subtitle, Button, Text, View, Item, Input } from 'native-base';
+import { ToastAndroid } from 'react-native';
+import { Button, Text, View, Item, Input } from 'native-base';
 
 import Modal from 'react-native-modal';
 import Api from '../services/Api';

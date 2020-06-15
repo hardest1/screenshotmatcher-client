@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, Image, ToastAndroid } from 'react-native';
-import { Header, Title, Subtitle, Button, Left, Right, Body, Content, Icon, Spinner, Text, Toast, Grid, Col } from 'native-base';
+import { Image, ToastAndroid } from 'react-native';
+import { Button, Content, Text, Grid, Col } from 'native-base';
 
 import { Linking } from "expo";
 

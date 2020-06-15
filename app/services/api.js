@@ -4,8 +4,6 @@ import * as FileSystem from 'expo-file-system';
 
 import { modelName, osName, osVersion } from 'expo-device';
 
-import { Linking } from "expo";
-
 // https://stackoverflow.com/a/54208009
 async function fetchWithTimeout(url, options, timeout = 5000) {
   return Promise.race([

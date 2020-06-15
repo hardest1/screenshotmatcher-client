@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import { Header, Title, Subtitle, Button, Left, Right, Body, Content, Icon, Spinner, Text } from 'native-base';
+import { Content, Text } from 'native-base';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
 export default class Barcode extends React.Component {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Header, Title, Subtitle, Button, Left, Right, Body, Icon, Spinner, Text } from 'native-base';
+import { Header, Title, Button, Left, Right, Body, Icon, Spinner } from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default class Head extends React.Component {
