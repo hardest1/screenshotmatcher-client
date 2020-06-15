@@ -3,6 +3,8 @@ import {
   View,
   StyleSheet,
   Alert,
+  Platform,
+  StatusBar
 } from 'react-native';
 
 import { Container, H1, Text, Button, StyleProvider } from 'native-base';
@@ -184,7 +186,7 @@ class Main extends React.Component {
     
     return (
       <StyleProvider style={getTheme(theme)}>
-        <Container>
+        <Container style={styles.containerStyle}>
 
           <Head 
             paired={this.state.paired} 
@@ -253,6 +255,9 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "center",
   },
+  containerStyle: {
+    paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight
+  }
 });
 
 export default Main;
