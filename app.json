@@ -28,6 +28,9 @@
     },
     "android": {
       "package": "de.ur.mi.screenshotmatcher.client"
+    },
+    "androidStatusBar": {
+      "translucent": true
     }
   }
 }
