@@ -91,7 +91,11 @@ class Api {
   postImage(picture){
     if(!this.baseUrl) return false;
 
+    const deviceStr =  `${modelName} with ${osName} ${osVersion}`
+
     const body = new FormData()
+
+    body.append('device', deviceStr)
 
     body.append('image_file.jpg', {
       uri: picture.uri,
@@ -128,7 +132,7 @@ class Api {
     console.log('Sending feedback', uid)
     const body = new FormData()
 
-    const deviceStr =  `${modelName} with ${osName} ${osVersion} `
+    const deviceStr =  `${modelName} with ${osName} ${osVersion}`
 
     body.append('uid', uid)
     body.append('hasResult', hasResult)
