@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   containerStyle: {
-    paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight
+    //paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight
   }
 });
 

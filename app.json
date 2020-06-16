@@ -29,8 +29,10 @@
     "android": {
       "package": "de.ur.mi.screenshotmatcher.client"
     },
+    "androidStatusBarColor": "#000",
     "androidStatusBar": {
-      "translucent": true
+      "translucent": "false",
+      "barStyle": "light-content"
     }
   }
 }
