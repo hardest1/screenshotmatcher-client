@@ -2,7 +2,7 @@ import { AsyncStorage } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 
-import { modelName, osName, osVersion } from 'expo-device';
+import { brand, modelName, osName, osVersion } from 'expo-device';
 
 // https://stackoverflow.com/a/54208009
 async function fetchWithTimeout(url, options, timeout = 5000) {
@@ -22,6 +22,9 @@ class Api {
   }
 
   async init(){
+
+    this.deviceStr =  `${brand} ${modelName} with ${osName} ${osVersion}`
+
     try {
       const addr = await AsyncStorage.getItem('apiAddress');
       if (addr !== null) { 
@@ -89,11 +92,9 @@ class Api {
   postImage(picture){
     if(!this.baseUrl) return false;
 
-    const deviceStr =  `${modelName} with ${osName} ${osVersion}`
-
     const body = new FormData()
 
-    body.append('device', deviceStr)
+    body.append('device', this.deviceStr)
 
     body.append('image_file.jpg', {
       uri: picture.uri,
@@ -130,13 +131,11 @@ class Api {
     console.log('Sending feedback', uid)
     const body = new FormData()
 
-    const deviceStr =  `${modelName} with ${osName} ${osVersion}`
-
     body.append('uid', uid)
     body.append('hasResult', hasResult)
     body.append('hasScreenshot', hasScreenshot)
     body.append('comment', comment)
-    body.append('device', deviceStr)
+    body.append('device', this.deviceStr)
 
     return this.callPOST('/feedback', body)
       .then(response => response)
