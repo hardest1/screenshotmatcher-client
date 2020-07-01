@@ -113,8 +113,9 @@ class Main extends React.Component {
 
     // post picture to the server
     const matchResult = await Api.postImage(manipResult)
-
-    console.log('match result', matchResult)
+    
+    if(matchResult) console.log( matchResult.hasResult ? 'Match successful' : 'Match failed' )
+    // console.log('match result', matchResult)
 
     if(!matchResult){
       this.setState({ isPhotoLoading: false, loadingMsg: '' });

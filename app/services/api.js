@@ -2,7 +2,7 @@ import { AsyncStorage } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 
-import { brand, modelName, osName, osVersion } from 'expo-device';
+import { modelName, osName, osVersion } from 'expo-device';
 
 // https://stackoverflow.com/a/54208009
 async function fetchWithTimeout(url, options, timeout = 5000) {
@@ -23,7 +23,7 @@ class Api {
 
   async init(){
 
-    this.deviceStr =  `${brand} ${modelName} with ${osName} ${osVersion}`
+    this.deviceStr =  `${modelName} with ${osName} ${osVersion}`
 
     try {
       const addr = await AsyncStorage.getItem('apiAddress');
